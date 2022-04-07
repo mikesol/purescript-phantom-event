@@ -1,16 +1,25 @@
-module FRP.Event.Phantom where
+module FRP.Event.Phantom (PhantomEvent, unsafePhantom, proof0, Proof0, toEvent) where
 
 import Prelude
 
 import Control.Alternative (class Alt, class Alternative, class Plus)
 import Data.Compactable (class Compactable)
-import Data.Newtype (class Newtype)
 import FRP.Event (class Filterable, class IsEvent, Event)
+
+data Proof0
 
 newtype PhantomEvent :: forall k. k -> Type -> Type
 newtype PhantomEvent phantom a = PhantomEvent (Event a)
 
-derive instance Newtype (PhantomEvent phantom a) _
+unsafePhantom :: forall proof a. Event a -> PhantomEvent proof a
+unsafePhantom = PhantomEvent
+
+proof0 :: forall a. Event a -> PhantomEvent Proof0 a
+proof0 = PhantomEvent
+
+toEvent :: forall proof a. PhantomEvent proof a -> Event a
+toEvent (PhantomEvent e) = e
+
 derive newtype instance Functor (PhantomEvent phantom)
 derive newtype instance Apply (PhantomEvent phantom)
 derive newtype instance Applicative (PhantomEvent phantom)
